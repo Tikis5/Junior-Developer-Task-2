@@ -36,9 +36,14 @@ function App() {
         const agesHandler = addAges(name);
         getData(getUrl("getDate/" + name), agesHandler);
       }
-      setAllDataIsReady(true);
     }
   }, [names, getData]);
+
+  useEffect(() => {
+    if (names?.length === Object.keys(ages)?.length) {
+      setAllDataIsReady(true);
+    }
+  }, [names, ages]);
 
   function addAges(name) {
     return function addAgesWithData(data) {
