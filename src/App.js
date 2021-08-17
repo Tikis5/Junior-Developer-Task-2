@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
+
 import Table from "./components/Table";
+
 import fetchData from "./utils/fetchData";
 import getUrl from "./utils/getUrl";
+
 import "./App.css";
 
 function App() {
@@ -24,11 +27,13 @@ function App() {
     if (!names?.length) {
       getData(getUrl("names"), setNames);
     }
+  }, [getData, names]);
 
+  useEffect(() => {
     if (!technologies?.length) {
       getData(getUrl("tech"), setTechnologies);
     }
-  }, [getData, names, technologies]);
+  }, [getData, technologies])
 
   useEffect(() => {
     if (names?.length) {
