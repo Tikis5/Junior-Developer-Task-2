@@ -1,11 +1,9 @@
 export default function TableRow(props) {
-  
   return (
     <tr>
-      {props.person.map((p, pInd) => {
-        return <td key={pInd}>{p}</td>;
-      })}
+      <td>{props.person.name}</td>
+      <td>{props.person.tech}</td>
+      <td>{props.person.age}</td>
     </tr>
   );
-  
 }

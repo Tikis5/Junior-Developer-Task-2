@@ -13,6 +13,7 @@ th {
   border-collapse: collapse;
   border: 1px solid #ddd;
   padding: 12px;
+  min-width: 55px;
 }
 
 tr:hover {
@@ -21,6 +22,7 @@ tr:hover {
 
 th {
   padding: 10px;
+  cursor: pointer;
   text-align: center;
   background-color: #4caf50;
   color: white;

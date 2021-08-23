@@ -1,77 +1,71 @@
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useCallback, useReducer } from "react";
 
 import Table from "./components/Table";
-
+import { appReducer, initialState } from "./reducer";
+import constants from "./constants";
 import fetchData from "./utils/fetchData";
 import getUrl from "./utils/getUrl";
 
-import "./App.css";
+import "./styles/App.css";
 
 function App() {
-  const [names, setNames] = useState();
-  const [technologies, setTechnologies] = useState();
-  const [ages, setAges] = useState({});
-  const [allDataIsReady, setAllDataIsReady] = useState(false);
-  const [errors, setErrors] = useState(null);
+  const [state, dispatch] = useReducer(appReducer, initialState);
+  console.log("RENDER");
+  console.log(state);
 
-  const getData = useCallback(async (url, handler) => {
+  const getData = useCallback(async (paths) => {
+    dispatch({ type: constants.INIT_REQUEST });
+
     try {
-      const data = await fetchData(url);
-      handler(data);
+      const names = await fetchData(paths.names);
+      const technologies = await fetchData(paths.tech);
+      const ages = await Promise.all(
+        names.map(async (name) => {
+          const data = await fetchData(paths.ages + name);
+          return [name, data];
+        })
+      );
+
+      dispatch({
+        type: constants.REQUEST_SUCCESS,
+        payload: {
+          names,
+          technologies,
+          ages: Object.fromEntries(ages),
+        },
+      });
     } catch (error) {
-      setErrors(error);
+      dispatch({
+        type: constants.REQUEST_FAILURE,
+        payload: error.message,
+      });
     }
   }, []);
 
   useEffect(() => {
-    if (!names?.length) {
-      getData(getUrl("names"), setNames);
-    }
-  }, [getData, names]);
-
-  useEffect(() => {
-    if (!technologies?.length) {
-      getData(getUrl("tech"), setTechnologies);
-    }
-  }, [getData, technologies])
-
-  useEffect(() => {
-    if (names?.length) {
-      for (let name of names) {
-        const agesHandler = addAges(name);
-        getData(getUrl("getDate/" + name), agesHandler);
-      }
-    }
-  }, [names, getData]);
-
-  useEffect(() => {
-    if (names?.length === Object.keys(ages)?.length) {
-      setAllDataIsReady(true);
-    }
-  }, [names, ages]);
-
-  function addAges(name) {
-    return function addAgesWithData(data) {
-      setAges((state) => {
-        return {
-          ...state,
-          [name]: data,
-        };
-      });
+    const paths = {
+      names: getUrl("names"),
+      tech: getUrl("tech"),
+      ages: getUrl("getDate/"),
     };
-  }
+    getData(paths);
+  }, [getData]);
 
-  if (errors) {
+  if (state.isError) {
     return <div>There was an error while loading data</div>;
   }
 
-  if (!allDataIsReady) {
+  if (state.isLoading) {
     return <div>Loading data...</div>;
   }
 
   return (
     <div className="App">
-      <Table names={names} technologies={technologies} ages={ages} />
+      <Table
+        names={state.names}
+        technologies={state.technologies}
+        ages={state.ages}
+      />
     </div>
   );
 }

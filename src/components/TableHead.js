@@ -1,18 +1,26 @@
-export default function TableHead(props) {
-    const headerElement = ["Name", "Tech", "Age"];
-    const {handleClick} = props;
+import Arrow from "./Arrow";
 
-    return (
-      <thead>
-        <tr>
-          {headerElement.map((el, ind) => {
-            return (
-              <th key={ind} onClick={() => handleClick(el)}>
-                { el }
-              </th>
-            )
-          })}
-        </tr>
-      </thead>
-    )
-  }
+import "../styles/tableHeading.css";
+
+export default function TableHead(props) {
+  const headerElement = ["Name", "Tech", "Age"];
+
+  return (
+    <thead>
+      <tr>
+        {headerElement.map((el, ind) => {
+          return (
+            <th key={ind} onClick={() => props.handleClick(el.toLowerCase())}>
+              <div className="table-heading">
+                {el}
+                {props.sortBy === el.toLowerCase() && (
+                  <Arrow arrow={props.sortOrder ? "up" : "down"} />
+                )}
+              </div>
+            </th>
+          );
+        })}
+      </tr>
+    </thead>
+  );
+}

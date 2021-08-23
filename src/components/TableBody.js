@@ -6,15 +6,14 @@ export default function TableBody(props) {
   const rows = [];
 
   for (let i = 0; i < props.names.length; i++) {
-    const currentName = props.names?.[i];
-    const personAge = getPersonAge(props.ages?.[currentName]); 
-    const personTechnology = props.technologies?.[i];
-    rows.push([currentName, personTechnology, personAge]);
+    const name = props.names?.[i];
+    const age = getPersonAge(props.ages?.[name]);
+    const tech = props.technologies?.[i];
+    rows.push({ name, tech, age });
   }
 
-  const rowData = sortTable(rows, props.sortBy).map((person, ind) => (
-    <TableRow key={ind} person={person} />
-  ));
-
+  const rowData = sortTable(rows, props.sortBy, props.sortOrder).map(
+    (person, ind) => <TableRow key={ind} person={person} />
+  );
   return <tbody>{rowData}</tbody>;
 }
